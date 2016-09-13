@@ -30,6 +30,7 @@ class ComfortableMexicanSofa::Tag::PageFile
       when 'url'      then render_url(file)
       when 'link'     then render_link(file)
       when 'image'    then render_image(file)
+      when 'image_url' then render_image_url(file)
       when 'partial'  then render_partial(file)
       else ''
     end
@@ -48,8 +49,15 @@ class ComfortableMexicanSofa::Tag::PageFile
   
   def render_image(file)
     return '' unless file
+    img_class = params[2] || ""
     text = params[1] || file.label
-    "<img src='#{file.file.url}' alt='#{text}' />"
+    "<img src='#{file.file.url}' alt='#{text}!!!!!' class='#{img_class}' />"
+  end
+  
+  def render_image_url(file)
+    return '' unless file
+    text = params[1] || file.label
+    file.file.url
   end
   
   def render_partial(file)
