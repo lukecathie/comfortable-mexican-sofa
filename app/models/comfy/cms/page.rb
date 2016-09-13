@@ -76,6 +76,10 @@ class Comfy::Cms::Page < ActiveRecord::Base
     end
   end
 
+  def to_liquid
+    Comfy::Cms::Drops::PageDrop.new(self)
+  end
+
 protected
 
   def assigns_label

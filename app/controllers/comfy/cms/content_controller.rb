@@ -1,4 +1,5 @@
 class Comfy::Cms::ContentController < Comfy::Cms::BaseController
+  include Comfy::LiquidContentHelper
 
   # Authentication module must have `authenticate` method
   include ComfortableMexicanSofa.config.public_auth.to_s.constantize
@@ -21,6 +22,21 @@ class Comfy::Cms::ContentController < Comfy::Cms::BaseController
     end
   end
 
+  def show_post
+    @blog = @cms_site.blogs.first
+    @post = @blog.posts.published.where(:slug => params[:slug]).first!
+    @cms_page = @cms_site.pages.find_by_full_path!("/news/post-placeholder")
+
+    if @cms_page.target_page.present?
+      redirect_to @cms_page.target_page.url(:relative)
+    else
+      respond_to do |format|
+        format.html { render_page }
+        format.json { render :json => @cms_page }
+      end
+    end
+  end
+
   def render_sitemap
     render
   end
@@ -30,7 +46,7 @@ protected
   def render_page(status = 200)
     if @cms_layout = @cms_page.layout
       app_layout = (@cms_layout.app_layout.blank? || request.xhr?) ? false : @cms_layout.app_layout
-      render  :inline       => @cms_page.content_cache,
+      render  :inline       => liquid_parse(@cms_page.content_cache),
               :layout       => app_layout,
               :status       => status,
               :content_type => mime_type
@@ -63,4 +79,5 @@ protected
   rescue ActiveRecord::RecordNotFound
     raise ActionController::RoutingError.new("Page Not Found at: \"#{params[:cms_path]}\"")
   end
+
 end

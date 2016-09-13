@@ -61,6 +61,10 @@ class Comfy::Cms::Site < ActiveRecord::Base
     super
   end
 
+  def to_liquid
+    Comfy::Cms::Drops::SiteDrop.new(self)
+  end
+
 protected
 
   def self.real_host_from_aliases(host)

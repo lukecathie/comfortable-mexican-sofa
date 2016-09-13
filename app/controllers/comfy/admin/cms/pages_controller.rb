@@ -1,4 +1,5 @@
 class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
+  include Comfy::LiquidContentHelper
 
   before_action :check_for_layouts, :only => [:new, :edit]
   before_action :build_cms_page,    :only => [:new, :create]
@@ -135,7 +136,7 @@ protected
       # Chrome chokes on content with iframes. Issue #434
       response.headers['X-XSS-Protection'] = '0'
 
-      render :inline => @page.render, :layout => layout, :content_type => 'text/html'
+      render :inline => liquid_parse(@page.render), :layout => layout, :content_type => 'text/html'
     end
   end
 
